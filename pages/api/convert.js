@@ -12,185 +12,189 @@ export const config = {
 
 function detectTablesFromText(text) {
   const lines = text.split('\n').map(line => line.trim()).filter(line => line);
-  const tables = [];
   
-  // First, always try the fallback detection which is more accurate for your PDF format
-  const detectedTables = fallbackTableDetection(lines);
-  
-  if (detectedTables.length > 0) {
-    return detectedTables;
-  }
-  
-  // If that didn't work, use the original detection logic
-  // ... (rest of the original function remains for other PDF formats)
-  
-  return tables;
-}
-
-function intelligentSplit(line) {
-  // For lines like "Blind 5 1 4 34.5%, n=1 1199 sec, n=1"
-  const segments = [];
-  
-  // Special handling for your table format
-  const patterns = [
-    /^(Blind|Low Vision|Dexterity|Mobility)\s+(\d+)\s+(\d+)\s+(\d+)\s+(.+)$/,
-    /^(\w+(?:\s+\w+)?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(.+)$/
+  // Try multiple detection strategies and return the best result
+  const strategies = [
+    detectComplexTables,      // For complex tables like the disability one
+    detectSimpleTables,       // For simple tables with clear structure
+    detectDataExamples,       // For the tutoring examples format
   ];
   
-  for (const pattern of patterns) {
-    const match = line.match(pattern);
-    if (match) {
-      // Extract matched groups
-      segments.push(match[1]); // Category
-      segments.push(match[2]); // Participants
-      segments.push(match[3]); // Ballots Completed
-      segments.push(match[4]); // Ballots Incomplete
-      
-      // Split the results part
-      const results = match[5];
-      const resultParts = results.split(/\s{2,}/).filter(s => s.trim());
-      if (resultParts.length >= 2) {
-        segments.push(resultParts[0]); // Accuracy
-        segments.push(resultParts[1]); // Time
-      } else {
-        // Try to split by looking for time pattern
-        const timeMatch = results.match(/(.+?)(\d+\s*sec.*)$/);
-        if (timeMatch) {
-          segments.push(timeMatch[1].trim());
-          segments.push(timeMatch[2].trim());
-        } else {
-          segments.push(results);
-        }
-      }
-      return segments;
+  let bestTables = [];
+  let bestScore = 0;
+  
+  for (const strategy of strategies) {
+    const result = strategy(lines);
+    if (result.tables.length > 0 && result.score > bestScore) {
+      bestTables = result.tables;
+      bestScore = result.score;
     }
   }
   
-  // Fallback to space-based splitting
-  return line.split(/\s{2,}/).filter(s => s.trim());
+  return bestTables;
 }
 
-function specialTableParsing(line, headers) {
-  // Handle special cases like continuation lines
-  if (line.includes('n=') && line.includes('%')) {
-    // This is likely accuracy data
-    return ['', '', '', '', line, ''];
-  } else if (line.includes('sec')) {
-    // This is likely time data
-    return ['', '', '', '', '', line];
-  }
-  
-  // Default: try to match the column count
-  const segments = line.split(/\s+/).filter(s => s.trim());
-  const result = new Array(headers.length || 6).fill('');
-  segments.forEach((seg, i) => {
-    if (i < result.length) {
-      result[i] = seg;
-    }
-  });
-  return result;
-}
-
-function fallbackTableDetection(lines) {
-  // More aggressive table detection for difficult PDFs
+// Strategy 1: Complex tables with multi-line cells (disability table)
+function detectComplexTables(lines) {
   const tables = [];
   const tableData = [];
+  let score = 0;
   
-  // Look for the specific table structure in your PDF
-  let headerFound = false;
-  let headerLine = null;
+  // Look for disability table pattern
+  const disabilityPattern = /^(Blind|Low Vision|Dexterity|Mobility|Disability)/i;
+  const hasDisabilityTable = lines.some(line => disabilityPattern.test(line));
   
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  if (hasDisabilityTable) {
+    let headerFound = false;
     
-    // Check for header patterns
-    if (line.includes('Disability') && line.includes('Category')) {
-      headerFound = true;
-      // Find the complete header line (might be split across lines)
-      let fullHeader = line;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       
-      // Check next lines for continuation of headers
-      if (i + 1 < lines.length && lines[i + 1].includes('Participants')) {
-        fullHeader += ' ' + lines[i + 1];
-        i++; // Skip the next line since we've processed it
-      }
-      if (i + 1 < lines.length && (lines[i + 1].includes('Ballots') || lines[i + 1].includes('Results'))) {
-        fullHeader += ' ' + lines[i + 1];
-        i++; // Skip the next line
+      // Check for header
+      if (line.includes('Disability') && line.includes('Category')) {
+        headerFound = true;
+        const headers = [
+          'Disability Category', 
+          'Participants', 
+          'Ballots Completed', 
+          'Ballots Incomplete/Terminated', 
+          'Accuracy', 
+          'Time to complete'
+        ];
+        tableData.push(headers);
+        score = 10; // High score for specific pattern match
+        continue;
       }
       
-      // Create proper headers
-      const headers = [
-        'Disability Category', 
-        'Participants', 
-        'Ballots Completed', 
-        'Ballots Incomplete/Terminated', 
-        'Accuracy', 
-        'Time to complete'
-      ];
-      tableData.push(headers);
-      continue;
-    }
-    
-    // Also check for simpler header patterns
-    if (!headerFound && (
-      (line.includes('Participants') && line.includes('Ballots')) ||
-      (line.includes('Category') && line.includes('Results')) ||
-      (line.includes('Accuracy') && line.includes('Time'))
-    )) {
-      headerFound = true;
-      const headers = [
-        'Disability Category', 
-        'Participants', 
-        'Ballots Completed', 
-        'Ballots Incomplete/Terminated', 
-        'Accuracy', 
-        'Time to complete'
-      ];
-      tableData.push(headers);
-      continue;
-    }
-    
-    if (headerFound) {
-      // Parse data rows
-      if (line.match(/^(Blind|Low Vision|Dexterity|Mobility)/)) {
-        const rowData = parseDataRow(line);
-        if (rowData) {
-          tableData.push(rowData);
-        }
-      } else if (line.includes('n=') || line.includes('sec')) {
-        // This might be a continuation of previous row
-        if (tableData.length > 1) { // > 1 because first row is headers
-          const lastRow = tableData[tableData.length - 1];
-          if (line.includes('%')) {
-            // This is accuracy data
-            if (!lastRow[4] || lastRow[4] === '') {
+      if (headerFound) {
+        if (line.match(/^(Blind|Low Vision|Dexterity|Mobility)/)) {
+          const rowData = parseDisabilityRow(line);
+          if (rowData) {
+            tableData.push(rowData);
+          }
+        } else if (line.includes('n=') || line.includes('sec')) {
+          // Handle continuation lines
+          if (tableData.length > 1) {
+            const lastRow = tableData[tableData.length - 1];
+            if (line.includes('%') && (!lastRow[4] || lastRow[4] === '')) {
               lastRow[4] = line.trim();
-            } else {
-              lastRow[4] = (lastRow[4] + ' ' + line).trim();
-            }
-          } else if (line.includes('sec')) {
-            // This is time data
-            if (!lastRow[5] || lastRow[5] === '') {
+            } else if (line.includes('sec') && (!lastRow[5] || lastRow[5] === '')) {
               lastRow[5] = line.trim();
-            } else {
-              lastRow[5] = (lastRow[5] + ' ' + line).trim();
             }
           }
         }
       }
     }
+    
+    if (tableData.length >= 2) {
+      tables.push({ rows: normalizeTable(tableData) });
+    }
   }
   
-  if (tableData.length >= 2) {
-    tables.push({ rows: normalizeTable(tableData) });
-  }
-  
-  return tables;
+  return { tables, score };
 }
 
-function parseDataRow(line) {
-  // Specific parsing for your table format
+// Strategy 2: Simple tables with clear delimiters
+function detectSimpleTables(lines) {
+  const tables = [];
+  let currentTable = [];
+  let inTable = false;
+  let score = 0;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Skip title lines
+    if (line.match(/^Example.*(Table|Graph)/i)) {
+      if (currentTable.length >= 2) {
+        tables.push({ rows: normalizeTable(currentTable) });
+        score += currentTable.length;
+      }
+      currentTable = [];
+      inTable = false;
+      continue;
+    }
+    
+    // Parse table row
+    const row = parseSimpleTableRow(line);
+    if (row && row.length >= 2) {
+      currentTable.push(row);
+      inTable = true;
+    } else if (inTable && (line === '' || i === lines.length - 1)) {
+      if (currentTable.length >= 2) {
+        tables.push({ rows: normalizeTable(currentTable) });
+        score += currentTable.length;
+      }
+      currentTable = [];
+      inTable = false;
+    }
+  }
+  
+  // Don't forget last table
+  if (currentTable.length >= 2) {
+    tables.push({ rows: normalizeTable(currentTable) });
+    score += currentTable.length;
+  }
+  
+  return { tables, score };
+}
+
+// Strategy 3: Data examples format (tutoring PDF)
+function detectDataExamples(lines) {
+  const tables = [];
+  let score = 0;
+  
+  // Look for Example patterns
+  let inExample = false;
+  let exampleData = [];
+  let currentHeaders = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Check for Example headers
+    if (line.match(/^Example \d+:/)) {
+      if (exampleData.length >= 2) {
+        tables.push({ rows: normalizeTable(exampleData) });
+        score += 5;
+      }
+      exampleData = [];
+      inExample = true;
+      continue;
+    }
+    
+    if (inExample) {
+      // Look for table structures within examples
+      if (line.includes('Number of Coils') || line.includes('Number of Paperclips')) {
+        currentHeaders = ['Number of Coils', 'Number of Paperclips'];
+        exampleData.push(currentHeaders);
+      } else if (line.includes('Time (drops') || line.includes('Distance (cm)')) {
+        currentHeaders = ['Time (drops of water)', 'Distance (cm)'];
+        exampleData.push(currentHeaders);
+      } else if (line.includes('Speed (mph)') || line.includes('Driver')) {
+        // Speed records table
+        currentHeaders = ['Speed (mph)', 'Driver', 'Car', 'Engine', 'Date'];
+        exampleData.push(currentHeaders);
+      } else {
+        // Try to parse as data row
+        const dataRow = parseExampleDataRow(line, currentHeaders);
+        if (dataRow) {
+          exampleData.push(dataRow);
+        }
+      }
+    }
+  }
+  
+  // Don't forget last example
+  if (exampleData.length >= 2) {
+    tables.push({ rows: normalizeTable(exampleData) });
+    score += 5;
+  }
+  
+  return { tables, score };
+}
+
+function parseDisabilityRow(line) {
   const match = line.match(/^(Blind|Low Vision|Dexterity|Mobility)\s+(\d+)\s+(\d+)\s+(\d+)\s+(.+?)(\d+(?:\.\d+)?\s*sec.*)$/);
   
   if (match) {
@@ -200,13 +204,13 @@ function parseDataRow(line) {
       match[3],           // Ballots Completed
       match[4],           // Ballots Incomplete
       match[5].trim(),    // Accuracy
-      match[6].trim()     // Time to complete
+      match[6].trim()     // Time
     ];
   }
   
-  // Simpler fallback
+  // Fallback parsing
   const parts = line.split(/\s+/);
-  if (parts.length >= 4) {
+  if (parts.length >= 4 && parts[0].match(/^(Blind|Low Vision|Dexterity|Mobility)/)) {
     const category = parts[0] + (parts[0] === 'Low' ? ' ' + parts[1] : '');
     const startIdx = category.split(' ').length;
     
@@ -215,9 +219,62 @@ function parseDataRow(line) {
       parts[startIdx] || '',
       parts[startIdx + 1] || '',
       parts[startIdx + 2] || '',
-      parts.slice(startIdx + 3).join(' ').split(/(?=\d+(?:\.\d+)?\s*sec)/)[0] || '',
-      parts.slice(startIdx + 3).join(' ').match(/\d+(?:\.\d+)?\s*sec.*/)?.[0] || ''
+      parts.slice(startIdx + 3).filter(p => p.includes('%') || p.includes('n=')).join(' ') || '',
+      parts.slice(startIdx + 3).filter(p => p.includes('sec')).join(' ') || ''
     ];
+  }
+  
+  return null;
+}
+
+function parseSimpleTableRow(line) {
+  // Try different delimiters
+  let segments;
+  
+  // Tab-separated
+  segments = line.split('\t').filter(s => s.trim());
+  if (segments.length >= 2) return segments;
+  
+  // Multiple spaces
+  segments = line.split(/\s{3,}/).filter(s => s.trim());
+  if (segments.length >= 2) return segments;
+  
+  // Two or more spaces
+  segments = line.split(/\s{2,}/).filter(s => s.trim());
+  if (segments.length >= 2) return segments;
+  
+  // Special patterns for water samples
+  if (line.includes('water') || line.includes('milk')) {
+    const match = line.match(/^(.+?)\s+(\d+)\s+(\d+)\s+(\d+)$/);
+    if (match) return match.slice(1);
+    
+    // For percentage data
+    const pctMatch = line.match(/^(.+?)\s+([\d/]+\s*=\s*\d+%?)\s+([\d/]+\s*=\s*\d+%?)\s+([\d/]+\s*=\s*\d+%?)$/);
+    if (pctMatch) return pctMatch.slice(1);
+  }
+  
+  return null;
+}
+
+function parseExampleDataRow(line, headers) {
+  if (!headers || headers.length === 0) return null;
+  
+  // For electromagnet data
+  if (headers.includes('Number of Coils')) {
+    const match = line.match(/^(\d+)\s+(.+)$/);
+    if (match) return [match[1], match[2]];
+  }
+  
+  // For time/distance data  
+  if (headers.includes('Time (drops of water)')) {
+    const match = line.match(/^(\d+)\s+(.+)$/);
+    if (match) return [match[1], match[2]];
+  }
+  
+  // For speed records
+  if (headers.includes('Speed (mph)')) {
+    const segments = line.split(/\s{2,}/).filter(s => s.trim());
+    if (segments.length >= 5) return segments;
   }
   
   return null;
@@ -267,12 +324,12 @@ export default async function handler(req, res) {
     
     try {
       const data = await pdf(buffer);
-      console.log('PDF text extracted:', data.text.substring(0, 500)); // Debug
+      console.log('PDF text length:', data.text.length);
       
-      // Detect tables
+      // Detect tables using adaptive strategies
       tables = detectTablesFromText(data.text);
       
-      console.log('Tables found:', tables.length); // Debug
+      console.log('Tables found:', tables.length);
       
     } catch (error) {
       console.error('PDF parsing error:', error);
