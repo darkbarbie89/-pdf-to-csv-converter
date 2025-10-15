@@ -8,10 +8,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "formidable": "^3.5.1",
+    "formidable": "^3.5.4",
     "lucide-react": "^0.303.0",
     "next": "^14.0.0",
     "pdf-parse": "^1.1.1",
+    "pdf2table": "^0.0.2",
     "pdfjs-dist": "^3.11.174",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
