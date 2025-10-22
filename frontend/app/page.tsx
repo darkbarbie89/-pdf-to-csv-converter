@@ -20,9 +20,7 @@ export default function Home() {
 
     try {
       // Connect to your FastAPI backend URL:
-      const res = await fetch(
-        "https://ideal-waddle-97x7r7rgr7pxhp9x6-8000.app.github.dev/convert",
-        {
+      const res = await fetch("https://pdf2csv-backend2.onrender.com/convert", {
           method: "POST",
           body: formData,
         }
