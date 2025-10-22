@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+camelot-py[cv]
+pandas
+PyPDF2
+pdfminer.six
+python-multipart

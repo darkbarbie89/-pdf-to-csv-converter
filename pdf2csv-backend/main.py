@@ -6,6 +6,18 @@ from extract import extract_tables
 
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"https://.*\.app\.github\.dev",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
 @app.post("/convert")
 async def convert_pdf(file: UploadFile = File(...)):
     try:
