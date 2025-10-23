@@ -1,0 +1,14 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://pdftocsv.app/sitemap.xml
+
+# Crawl-delay for responsible crawling
+Crawl-delay: 1
+
+# Disallow admin or private areas (if any)
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
