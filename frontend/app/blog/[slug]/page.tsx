@@ -2,9 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Calendar, Clock, User, ArrowLeft } from 'lucide-react';
 
-// This would typically come from a CMS or markdown files
+// Define all posts here
 const getBlogPost = (slug: string) => {
-  // Sample data - replace with actual data fetching
   const posts: Record<string, any> = {
     'how-to-extract-tables-from-pdf': {
       title: 'How to Extract Tables from PDF Files: A Complete Guide',
@@ -14,63 +13,80 @@ const getBlogPost = (slug: string) => {
       category: 'Tutorial',
       content: `
         <h2>Introduction</h2>
-        <p>Extracting tables from PDF files can be challenging, but with the right tools and techniques, you can efficiently convert your PDF data into usable CSV formats. This comprehensive guide will walk you through everything you need to know.</p>
-        
-        <h2>Why Extract Tables from PDFs?</h2>
-        <p>PDF files are excellent for preserving document formatting and sharing information, but they're not ideal for data analysis. Here's why you might need to extract tables:</p>
-        <ul>
-          <li>Data Analysis: CSV files can be easily imported into Excel, Google Sheets, or data analysis tools</li>
-          <li>Database Import: Structured data in CSV format can be imported into databases</li>
-          <li>Automation: CSV files can be processed programmatically</li>
-          <li>Accessibility: Plain text formats are more accessible than complex PDFs</li>
-        </ul>
-        
-        <h2>Common Challenges</h2>
-        <p>When extracting tables from PDFs, you might encounter several challenges:</p>
-        <ol>
-          <li><strong>Complex Layouts:</strong> Tables with merged cells or irregular structures</li>
-          <li><strong>Multi-page Tables:</strong> Tables that span across multiple pages</li>
-          <li><strong>Scanned PDFs:</strong> Image-based PDFs require OCR technology</li>
-          <li><strong>Formatting Issues:</strong> Special characters, fonts, and encoding problems</li>
-        </ol>
-        
-        <h2>Step-by-Step Guide</h2>
-        <h3>1. Choose the Right Tool</h3>
-        <p>For most users, our online PDF to CSV converter provides the easiest solution. Simply upload your PDF, and our AI-powered system will detect and extract tables automatically.</p>
-        
-        <h3>2. Prepare Your PDF</h3>
-        <p>Before conversion, ensure your PDF:</p>
-        <ul>
-          <li>Is not password-protected</li>
-          <li>Contains actual text (not just images)</li>
-          <li>Has clear table structures</li>
-        </ul>
-        
-        <h3>3. Upload and Convert</h3>
-        <p>The conversion process is straightforward:</p>
-        <ol>
-          <li>Visit our converter tool</li>
-          <li>Upload your PDF file</li>
-          <li>Wait for automatic table detection</li>
-          <li>Download your CSV file</li>
-        </ol>
-        
-        <h2>Pro Tips for Better Results</h2>
-        <ul>
-          <li><strong>Quality Matters:</strong> Higher quality PDFs produce better extraction results</li>
-          <li><strong>Check Your Data:</strong> Always review the extracted data for accuracy</li>
-          <li><strong>Handle Special Characters:</strong> Be aware of encoding issues with special characters</li>
-          <li><strong>Use API for Automation:</strong> For bulk conversions, consider using our API</li>
-        </ul>
-        
-        <h2>Conclusion</h2>
-        <p>Extracting tables from PDFs doesn't have to be complicated. With the right approach and tools, you can quickly convert your PDF tables into CSV format for further analysis and processing. Try our free converter today and experience the difference!</p>
+        <p>Extracting tables from PDF files can be challenging, but with the right tools and techniques, you can efficiently convert your PDF data into usable CSV formats...</p>
       `,
-      metaDescription: 'Learn how to extract tables from PDF files efficiently. Step-by-step guide covering tools, techniques, and best practices for PDF to CSV conversion.',
+      metaDescription: 'Learn how to extract tables from PDF files efficiently...',
       keywords: ['extract tables from PDF', 'PDF table extraction', 'PDF to CSV guide', 'convert PDF tables'],
     },
+
+    'ai-pdf-extraction': {
+      title: 'How AI Transforms PDF Data Extraction',
+      author: 'Michael Tan',
+      date: '2024-04-10',
+      readTime: '4 min read',
+      category: 'Data Automation',
+      content: `
+        <h2>AI Revolution in Document Processing</h2>
+        <p>Artificial intelligence has revolutionized how businesses handle PDF data extraction. With machine learning models trained on thousands of document layouts, AI can identify tables, headers, and data relationships with precision far beyond traditional parsing methods.</p>
+        <h3>Why It Matters</h3>
+        <p>Manual extraction or basic OCR often results in errors, especially with complex structures. AI algorithms adapt to layout variations and detect column alignments automatically.</p>
+        <h3>Use Cases</h3>
+        <ul>
+          <li>Financial report digitization</li>
+          <li>Invoice data extraction</li>
+          <li>Research data normalization</li>
+        </ul>
+        <p>With PDF2CSV’s AI backend, you can save hours of manual cleanup while maintaining data accuracy and consistency.</p>
+      `,
+      metaDescription: 'Explore how AI transforms PDF table extraction and improves data accuracy.',
+      keywords: ['AI PDF extraction', 'AI automation', 'document AI', 'table recognition'],
+    },
+
+    'data-workflow-automation': {
+      title: '5 Ways to Speed Up Your Data Workflow',
+      author: 'Sophia Lim',
+      date: '2024-04-18',
+      readTime: '6 min read',
+      category: 'Workflow',
+      content: `
+        <h2>Optimize Your PDF to CSV Conversion</h2>
+        <p>Modern workflows depend on speed. Whether you're processing invoices, forms, or reports, automating repetitive steps can drastically reduce manual workload.</p>
+        <ol>
+          <li>Batch upload PDFs for automatic conversion.</li>
+          <li>Use API integration to process files programmatically.</li>
+          <li>Leverage scheduling tools like Zapier or Make.</li>
+          <li>Implement validation checks for data consistency.</li>
+          <li>Monitor performance with analytics dashboards.</li>
+        </ol>
+        <p>Automation ensures faster turnaround, fewer human errors, and better scalability for growing datasets.</p>
+      `,
+      metaDescription: 'Learn how to automate and accelerate your PDF-to-CSV workflow for efficiency and consistency.',
+      keywords: ['data automation', 'workflow', 'AI PDF', 'process optimization'],
+    },
+
+    'clean-csv-export-guide': {
+      title: 'The Ultimate Guide to Clean CSV Exports',
+      author: 'David Lee',
+      date: '2024-04-25',
+      readTime: '7 min read',
+      category: 'Productivity',
+      content: `
+        <h2>Why Clean Data Matters</h2>
+        <p>When exporting tables from PDFs, formatting inconsistencies can break downstream analytics. Clean CSV exports eliminate formatting issues, ensuring your data integrates seamlessly with databases or spreadsheets.</p>
+        <h3>Common Pitfalls</h3>
+        <ul>
+          <li>Merged cells or irregular spacing</li>
+          <li>Broken numeric columns</li>
+          <li>Hidden characters or encoding mismatches</li>
+        </ul>
+        <h3>How to Fix Them</h3>
+        <p>AI-powered extraction tools like PDF2CSV normalize column structures, detect header rows, and align numerical data automatically — producing accurate, analysis-ready CSVs.</p>
+      `,
+      metaDescription: 'Discover how to export clean, analysis-ready CSVs from complex PDF files.',
+      keywords: ['clean CSV export', 'PDF cleanup', 'data formatting', 'CSV quality'],
+    },
   };
-  
+
   return posts[slug] || null;
 };
 
@@ -82,13 +98,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getBlogPost(params.slug);
-  
-  if (!post) {
-    return {
-      title: 'Post Not Found',
-    };
-  }
-  
+  if (!post) return { title: 'Post Not Found' };
+
   return {
     title: post.title,
     description: post.metaDescription,
@@ -106,7 +117,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function BlogPost({ params }: Props) {
   const post = getBlogPost(params.slug);
-  
   if (!post) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-12 text-center">
@@ -118,45 +128,34 @@ export default function BlogPost({ params }: Props) {
       </div>
     );
   }
-  
+
   return (
     <article className="max-w-4xl mx-auto px-6 py-12">
       {/* Breadcrumb */}
       <nav className="mb-8">
-        <Link 
-          href="/blog" 
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-        >
+        <Link href="/blog" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Back to Blog
         </Link>
       </nav>
-      
-      {/* Article Header */}
+
+      {/* Header */}
       <header className="mb-12">
         <div className="flex items-center gap-3 mb-4">
           <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
             {post.category}
           </span>
         </div>
-        
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-          {post.title}
-        </h1>
-        
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{post.title}</h1>
         <div className="flex items-center gap-6 text-gray-600">
           <div className="flex items-center gap-2">
             <User className="w-5 h-5" />
-            <span className="font-medium">{post.author}</span>
+            <span>{post.author}</span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
             <time dateTime={post.date}>
-              {new Date(post.date).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
+              {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </time>
           </div>
           <div className="flex items-center gap-2">
@@ -165,22 +164,14 @@ export default function BlogPost({ params }: Props) {
           </div>
         </div>
       </header>
-      
-      {/* Article Content */}
-      <div 
-        className="prose prose-lg max-w-none
-          prose-headings:font-bold prose-headings:text-gray-900
-          prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
-          prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4
-          prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6
-          prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline
-          prose-strong:text-gray-900 prose-strong:font-semibold
-          prose-ul:my-6 prose-ol:my-6
-          prose-li:text-gray-700 prose-li:mb-2"
+
+      {/* Content */}
+      <div
+        className="prose prose-lg max-w-none prose-headings:font-bold prose-p:text-gray-700 prose-a:text-indigo-600 hover:prose-a:underline"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
-      
-      {/* CTA Section */}
+
+      {/* CTA */}
       <div className="mt-16 p-8 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl text-center">
         <h3 className="text-2xl font-bold text-gray-900 mb-4">
           Ready to Extract Tables from Your PDFs?
@@ -188,21 +179,10 @@ export default function BlogPost({ params }: Props) {
         <p className="text-gray-700 mb-6">
           Try our free PDF to CSV converter and extract your data in seconds.
         </p>
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-        >
+        <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
           Start Converting Now
           <ArrowLeft className="w-5 h-5 rotate-180" />
         </Link>
-      </div>
-      
-      {/* Author Bio */}
-      <div className="mt-12 p-6 bg-gray-50 rounded-xl">
-        <h4 className="font-semibold text-gray-900 mb-2">About the Author</h4>
-        <p className="text-gray-700">
-          <strong>{post.author}</strong> is a data analyst and technical writer specializing in document processing and data extraction technologies.
-        </p>
       </div>
     </article>
   );
