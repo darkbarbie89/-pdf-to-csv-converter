@@ -1,66 +1,62 @@
-'use client';
-
-import Link from 'next/link';
-import { ArrowRight, FileText } from 'lucide-react';
+import Link from "next/link";
 
 export default function BlogPage() {
   const posts = [
     {
-      slug: 'how-to-extract-tables-from-pdf',
-      title: 'How to Extract Tables from PDF Files: A Complete Guide',
-      excerpt:
-        'A complete tutorial on converting PDF tables into CSV for analysis — tools, challenges, and pro tips for accurate extraction.',
-      category: 'Tutorial',
-      date: 'March 15, 2024',
-      readTime: '5 min read',
-      color: 'text-indigo-600',
+      slug: "ai-pdf-extraction",
+      title: "How AI Transforms PDF Data Extraction",
+      category: "Data Automation",
+      description:
+        "Explore how artificial intelligence can identify and extract structured tables from messy PDFs with near-human accuracy.",
+      color: "bg-indigo-50 text-indigo-700",
+    },
+    {
+      slug: "data-workflow-automation",
+      title: "5 Ways to Speed Up Your Data Workflow",
+      category: "Workflow",
+      description:
+        "Learn practical ways to automate PDF-to-CSV tasks and cut hours from manual data processing routines.",
+      color: "bg-green-50 text-green-700",
+    },
+    {
+      slug: "clean-csv-export",
+      title: "The Ultimate Guide to Clean CSV Exports",
+      category: "Productivity",
+      description:
+        "Discover how to handle messy formatting, merged cells, and numeric alignment issues when converting PDFs to CSV.",
+      color: "bg-pink-50 text-pink-700",
     },
   ];
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 py-20">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Our <span className="text-gradient">Blog</span>
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Explore tutorials, best practices, and insights on PDF data extraction and automation.
-          </p>
-        </div>
+    <section className="max-w-7xl mx-auto px-6 py-16">
+      <h1 className="text-5xl font-bold text-center mb-6">
+        Our <span className="text-indigo-600">Blog</span>
+      </h1>
+      <p className="text-gray-600 text-center max-w-2xl mx-auto mb-16">
+        Explore tutorials, best practices, and insights on PDF data extraction and workflow automation.
+      </p>
 
-        {/* Blog Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {posts.map((post) => (
+      <div className="grid md:grid-cols-3 gap-10">
+        {posts.map((post) => (
+          <Link
+            key={post.slug}
+            href={`/blog/${post.slug}`}
+            className="group block border rounded-2xl p-8 hover:shadow-xl transition"
+          >
             <div
-              key={post.slug}
-              className="group bg-white rounded-2xl border border-gray-100 hover:shadow-2xl transition-all duration-300 overflow-hidden p-8"
+              className={`inline-block px-3 py-1 text-sm font-medium rounded-full mb-4 ${post.color}`}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`p-3 rounded-xl bg-gray-50 ${post.color}`}>
-                  <FileText className="w-6 h-6" />
-                </div>
-                <span className={`text-sm font-semibold ${post.color}`}>{post.category}</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-indigo-600 transition-colors">
-                {post.title}
-              </h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">{post.excerpt}</p>
-              <div className="flex justify-between items-center">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="inline-flex items-center text-indigo-600 font-semibold hover:gap-2 transition-all"
-                >
-                  Read More
-                  <ArrowRight className="w-5 h-5 ml-1" />
-                </Link>
-                <span className="text-sm text-gray-500">{post.readTime}</span>
-              </div>
+              {post.category}
             </div>
-          ))}
-        </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-3 group-hover:text-indigo-600 transition">
+              {post.title}
+            </h2>
+            <p className="text-gray-600 mb-4">{post.description}</p>
+            <span className="text-indigo-600 font-medium text-sm">Read More →</span>
+          </Link>
+        ))}
       </div>
-    </main>
+    </section>
   );
 }
